@@ -38,7 +38,6 @@ class StderrLoggerTest extends TestCase
         $logger = new StderrLogger(LogLevel::DEBUG, $stream);
 
         $this->expectException(InvalidArgumentException::class);
-        /** @phpstan-ignore-next-line */
         $logger->log([], 'hello');
     }
 
