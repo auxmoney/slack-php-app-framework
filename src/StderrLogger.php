@@ -46,8 +46,16 @@ class StderrLogger extends AbstractLogger
         }
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
+        if (!is_string($level)) {
+            if (is_object($level) && method_exists($level, '__toString')) {
+                $level = (string) $level;
+            } else {
+                throw new InvalidArgumentException('Invalid log level: must be a string or stringable object');
+            }
+        }
+
         if (!isset(self::LOG_LEVEL_MAP[$level])) {
             throw new InvalidArgumentException("Invalid log level: {$level}");
         }
@@ -65,6 +73,14 @@ class StderrLogger extends AbstractLogger
             }
 
             $context['exception'] = explode("\n", (string) $exception);
+        }
+
+        if (!is_string($message)) {
+            if (is_object($message) && method_exists($message, '__toString')) {
+                $message = (string) $message;
+            } else {
+                throw new InvalidArgumentException('Invalid log message: must be a string or stringable object');
+            }
         }
 
         fwrite($this->stream, json_encode(compact('level', 'message', 'context')) . "\n");
